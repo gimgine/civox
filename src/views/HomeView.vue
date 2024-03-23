@@ -1,10 +1,27 @@
 <template>
-  <google-map :api-key="API_KEY" :center="center" :zoom="15" class="w-full h-full !cursor-not-allowed" disable-default-ui @click="handleMapClick">
-    <marker :options="{ position: center, label: 'Hello' }" />
-  </google-map>
+  <g-map-map
+    ref="googleMap"
+    :center="{ lat: 40.18337107366327, lng: -92.58079673526358 }"
+    :zoom="14"
+    class="w-full h-full"
+    @click="handleMapClick"
+    @zoom_changed="handleZoomChange"
+    :options="{ disableDefaultUI: true }"
+  >
+    <g-map-marker
+      v-for="development in showMarkers ? developments : []"
+      :position="{ lat: development.latitude, lng: development.longitude }"
+      :icon="{
+        url: '/favicon.ico',
+        labelOrigin: { x: 16, y: -10 }
+      }"
+      :label="development.title"
+    />
+    <g-map-marker v-if="addPosition" :position="addPosition" />
+  </g-map-map>
   <span class="absolute top-6 left-10 font-black text-5xl tracking-wider">civox</span>
   <message class="absolute top-10 left-1/2 -translate-x-1/2" :closable="false" severity="secondary" v-show="isAddSelected"
-    >Left click anywhere to add a development. Move around using the scroll wheel.</message
+    >Left click anywhere to add a development</message
   >
   <toggle-button
     class="absolute bottom-10 right-10 w-16 h-16"
@@ -15,23 +32,42 @@
   >
     <template #icon><i class="pi pi-plus text-2xl"></i></template>
   </toggle-button>
+  <add-development-dialog ref="addDevelopmentDialog" @close="handleAddClose" />
 </template>
 
 <script setup lang="ts">
-import { GoogleMap, Marker } from 'vue3-google-map';
+import AddDevelopmentDialog from '@/components/AddDevelopmentDialog.vue';
 import ToggleButton from 'primevue/togglebutton';
 import Message from 'primevue/message';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import pb from '@/util/pocketbase';
+import type { DevelopmentsRecord } from '@/util/pocketbase-types';
 
-const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-const center = { lat: 40.689247, lng: -74.044502 };
-
+const googleMap = ref();
+const addDevelopmentDialog = ref();
+const showMarkers = ref(true);
 const isAddSelected = ref(false);
-const mapMarkers = ref<any[]>([]);
+const addPosition = ref<object | null>(null);
+const developments = ref<DevelopmentsRecord[]>([]);
 
 const handleMapClick = (event: any) => {
-  if (!isAddSelected) return;
-  mapMarkers.value.push({ lat: event.latLng.lat(), lng: event.latLng.lng() });
+  if (!isAddSelected.value) return;
+  addPosition.value = { lat: event.latLng.lat(), lng: event.latLng.lng() };
+  googleMap.value.panTo(addPosition.value);
+  addDevelopmentDialog.value.open();
   isAddSelected.value = false;
 };
+
+const handleZoomChange = (zoom: number) => {
+  showMarkers.value = zoom >= 13;
+};
+
+const handleAddClose = async (submitted: boolean) => {
+  addPosition.value = null;
+  if (submitted) developments.value = await pb.collection('developments').getFullList();
+};
+
+onMounted(async () => {
+  developments.value = await pb.collection('developments').getFullList();
+});
 </script>
