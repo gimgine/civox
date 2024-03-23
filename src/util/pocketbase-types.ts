@@ -99,7 +99,10 @@ export type FeedbackRecord = {
   vote?: FeedbackVoteOptions;
 };
 
-export type UsersRecord = never;
+export type UsersRecord = {
+  avatar?: string;
+  name?: string;
+};
 
 // Response types include system fields and match responses from the PocketBase API
 export type DevelopmentsResponse<Texpand = unknown> = Required<DevelopmentsRecord> & BaseSystemFields<Texpand>;
