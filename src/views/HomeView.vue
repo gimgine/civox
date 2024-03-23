@@ -24,7 +24,6 @@
   <message class="absolute top-10 left-1/2 -translate-x-1/2" :closable="false" severity="secondary" v-show="isAddSelected">
     Left click anywhere to add a development
   </message>
-  <prime-button />
   <toggle-button
     class="absolute bottom-10 right-10 w-16 h-16"
     on-label=""
