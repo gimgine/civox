@@ -1,7 +1,7 @@
 <template>
-  <development-details />
+  <development-details-dialog />
 </template>
 
 <script setup lang="ts">
-import DevelopmentDetails from '../components/DevelopmentDetails.vue';
+import DevelopmentDetailsDialog from '../components/DevelopmentDetailsDialog.vue';
 </script>
