@@ -80,7 +80,9 @@ export enum DevelopmentsTypeOptions {
 }
 export type DevelopmentsRecord = {
   description?: string;
+  expectedStart?: IsoDateString;
   images?: string[];
+  proposedBy?: string;
   title?: string;
   type?: DevelopmentsTypeOptions;
 };
