@@ -61,7 +61,7 @@
     </div>
   </prime-dialog>
 
-  <add-feedback-dialog ref="addFeedbackDialog" developmentId="r3pd3w95pqx1o31" @form-submit="reload()" />
+  <add-feedback-dialog ref="addFeedbackDialog" :developmentId="development.id" @form-submit="reload(development.id)" />
 </template>
 
 <script setup lang="ts">
@@ -72,7 +72,7 @@ import PrimeImage from 'primevue/image';
 import PrimeButton from 'primevue/button';
 import ProgressSpinner from 'primevue/progressspinner';
 import pb from '@/util/pocketbase';
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import type { DevelopmentsResponse, FeedbackResponse } from '@/util/pocketbase-types';
 import { FeedbackVoteOptions } from '@/util/pocketbase-types';
 import { formatDateMonthYear } from '@/util/dates';
@@ -81,19 +81,25 @@ type DevelopmentsExpandFeedback = DevelopmentsResponse<{ 'feedback(development)'
 
 const addFeedbackDialog = ref({} as InstanceType<typeof AddFeedbackDialog>);
 
-const isDialogVisible = ref(true);
+const isDialogVisible = ref(false);
 const isLoading = ref(false);
-const development = ref<DevelopmentsExpandFeedback>();
+const development = ref<DevelopmentsExpandFeedback>({} as DevelopmentsExpandFeedback);
 const imageUrls = ref<string[]>([]);
 const percentageString = ref<string>();
 const percentageDecimal = ref<number>();
 
-const reload = async () => {
+const open = (developmentId: string) => {
+  isDialogVisible.value = true;
+  reload(developmentId);
+};
+defineExpose({ open });
+
+const reload = async (developmentId: string) => {
   isLoading.value = true;
   imageUrls.value = [];
   const developmentResponse = await pb
     .collection('developments')
-    .getFirstListItem<DevelopmentsExpandFeedback>('id="r3pd3w95pqx1o31"', { expand: 'feedback(development)' });
+    .getFirstListItem<DevelopmentsExpandFeedback>(`id="${developmentId}"`, { expand: 'feedback(development)' });
   development.value = developmentResponse;
   console.log(development.value);
 
@@ -117,8 +123,4 @@ const reload = async () => {
   }
   isLoading.value = false;
 };
-
-onMounted(async () => {
-  await reload();
-});
 </script>
