@@ -8,8 +8,7 @@ import type { RecordService } from 'pocketbase';
 export enum Collections {
   Developments = 'developments',
   Feedback = 'feedback',
-  Users = 'users',
-  Votes = 'votes'
+  Users = 'users'
 }
 
 // Alias types for improved usability
@@ -80,15 +79,24 @@ export enum DevelopmentsTypeOptions {
 }
 export type DevelopmentsRecord = {
   description?: string;
+  expectedStart?: IsoDateString;
   images?: string[];
+  latitude?: number;
+  longitude?: number;
+  proposedBy?: string;
   title?: string;
   type?: DevelopmentsTypeOptions;
 };
 
+export enum FeedbackVoteOptions {
+  'yay' = 'yay',
+  'nay' = 'nay'
+}
 export type FeedbackRecord = {
   content?: string;
-  development?: RecordIdString;
+  development: RecordIdString;
   username?: string;
+  vote?: FeedbackVoteOptions;
 };
 
 export type UsersRecord = {
@@ -96,20 +104,10 @@ export type UsersRecord = {
   name?: string;
 };
 
-export enum VotesValueOptions {
-  'yay' = 'yay',
-  'nay' = 'nay'
-}
-export type VotesRecord = {
-  development?: RecordIdString;
-  value?: VotesValueOptions;
-};
-
 // Response types include system fields and match responses from the PocketBase API
 export type DevelopmentsResponse<Texpand = unknown> = Required<DevelopmentsRecord> & BaseSystemFields<Texpand>;
 export type FeedbackResponse<Texpand = unknown> = Required<FeedbackRecord> & BaseSystemFields<Texpand>;
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>;
-export type VotesResponse<Texpand = unknown> = Required<VotesRecord> & BaseSystemFields<Texpand>;
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 
@@ -117,14 +115,12 @@ export type CollectionRecords = {
   developments: DevelopmentsRecord;
   feedback: FeedbackRecord;
   users: UsersRecord;
-  votes: VotesRecord;
 };
 
 export type CollectionResponses = {
   developments: DevelopmentsResponse;
   feedback: FeedbackResponse;
   users: UsersResponse;
-  votes: VotesResponse;
 };
 
 // Type for usage with type asserted PocketBase instance
@@ -134,5 +130,4 @@ export type TypedPocketBase = PocketBase & {
   collection(idOrName: 'developments'): RecordService<DevelopmentsResponse>;
   collection(idOrName: 'feedback'): RecordService<FeedbackResponse>;
   collection(idOrName: 'users'): RecordService<UsersResponse>;
-  collection(idOrName: 'votes'): RecordService<VotesResponse>;
 };
