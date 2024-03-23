@@ -16,6 +16,10 @@ jobs:
         with:
           node-version: 20
 
+      - name: Create Environment File
+        run: |
+          echo "VITE_GOOGLE_MAPS_API_KEY=$GOOGLE_MAPS_API_KEY" > .env
+
       - name: Install Dependencies and Build
         run: |
           npm ci

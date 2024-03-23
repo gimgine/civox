@@ -1,12 +1,5 @@
 <template>
-  <google-map
-    api-key="AIzaSyC-mFZCyXPzuN8X_wJHOQ8qR-EitpDH1r4"
-    :center="center"
-    :zoom="15"
-    class="w-full h-full !cursor-not-allowed"
-    disable-default-ui
-    @click="handleMapClick"
-  >
+  <google-map :api-key="API_KEY" :center="center" :zoom="15" class="w-full h-full !cursor-not-allowed" disable-default-ui @click="handleMapClick">
     <marker :options="{ position: center, label: 'Hello' }" />
   </google-map>
   <span class="absolute top-6 left-10 font-black text-5xl tracking-wider">civox</span>
@@ -30,7 +23,7 @@ import ToggleButton from 'primevue/togglebutton';
 import Message from 'primevue/message';
 import { ref } from 'vue';
 
-const API_KEY = import.meta.env.PROD ? import.meta.env.VITE_GOOGLE_MAPS_API_KEY_PROD : import.meta.env.VITE_GOOGLE_MAPS_API_KEY_DEV;
+const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const center = { lat: 40.689247, lng: -74.044502 };
 
 const isAddSelected = ref(false);
