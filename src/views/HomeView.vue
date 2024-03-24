@@ -6,6 +6,7 @@
   <sidebar v-model:visible="isSidebarOpen" position="right" :modal="false" :dismissable="false" @hide="developmentFilter = ''">
     <div class="flex flex-col h-full py-1">
       <div class="flex gap-2 flex-1 flex-col h-full">
+        <prime-button v-if="pb.authStore.model?.isDeveloper" label="Developer Dashboard" icon="pi pi-wrench" text @click="developerDashboard.open" />
         <label>Search Developments</label>
         <input-group>
           <auto-complete
@@ -82,7 +83,7 @@
   </toggle-button>
   <add-development-dialog ref="addDevelopmentDialog" @close="handleAddClose" />
   <development-details-dialog ref="developmentDetailsDialog" />
-  <developer-dashboard @dialog-close="reload" />
+  <developer-dashboard ref="developerDashboard" @dialog-close="reload" @locate="handleMarkerClick" />
 </template>
 
 <script setup lang="ts">
@@ -172,6 +173,7 @@ const developmentTypesToCategories = {
 } as object & { [key: string]: any };
 
 const developmentDetailsDialog = ref({} as InstanceType<typeof DevelopmentDetailsDialog>);
+const developerDashboard = ref({} as InstanceType<typeof DeveloperDashboard>);
 const googleMap = ref();
 const addDevelopmentDialog = ref();
 const showMarkers = ref(true);
@@ -196,7 +198,7 @@ const handleMapClick = (event: any) => {
   isAddSelected.value = false;
 };
 
-const handleMarkerClick = (development: DevelopmentsResponse) => {
+const handleMarkerClick = (development: { id: string; latitude: number; longitude: number }) => {
   developmentDetailsDialog.value.open(development.id);
   googleMap.value.panTo({ lat: development.latitude, lng: development.longitude });
 };

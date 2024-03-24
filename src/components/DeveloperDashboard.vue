@@ -13,11 +13,14 @@
               rounded
               class="w-8 h-8"
               @click="
-                emits('locate', {
-                  developmentId: slotProps.data.developmentId,
-                  longitude: slotProps.data.longitude,
-                  latitude: slotProps.data.latitude
-                })
+                () => {
+                  emits('locate', {
+                    id: slotProps.data.id,
+                    longitude: slotProps.data.longitude,
+                    latitude: slotProps.data.latitude
+                  });
+                  visible = false;
+                }
               "
             />
             <prime-button icon="pi pi-times" severity="danger" rounded class="w-8 h-8" @click="confirmDelete($event, slotProps.data.developmentId)" />
@@ -38,7 +41,7 @@ import DataTable from 'primevue/datatable';
 import PrimeButton from 'primevue/button';
 import Column from 'primevue/column';
 import PrimeDialog from 'primevue/dialog';
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import { formatDateMonthYear } from '@/util/dates';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
@@ -52,8 +55,9 @@ const open = () => {
   visible.value = true;
   reload();
 };
+defineExpose({ open });
 
-const emits = defineEmits<{ (e: 'locate', data: { developmentId: string; longitude: number; latitude: number }): void; (e: 'dialog-close'): void }>();
+const emits = defineEmits<{ (e: 'locate', data: { id: string; longitude: number; latitude: number }): void; (e: 'dialog-close'): void }>();
 
 const tableData = ref<
   {
@@ -61,7 +65,7 @@ const tableData = ref<
     feedbackAmount: number;
     approvalRating: string;
     expectedStart: string;
-    developmentId: string;
+    id: string;
     latitude: number;
     longitude: number;
   }[]
@@ -97,11 +101,11 @@ const reload = async () => {
     const feedbackAmount = feedbackResponse.length;
     const approvalRating = feedbackAmount > 0 ? `${Math.floor(decimal * 100)}%` : '---';
     const expectedStart = formatDateMonthYear(dev.expectedStart);
-    const developmentId = dev.id;
+    const id = dev.id;
     const latitude = dev.latitude;
     const longitude = dev.longitude;
 
-    tableData.value.push({ title, feedbackAmount, approvalRating, expectedStart, developmentId, latitude, longitude });
+    tableData.value.push({ title, feedbackAmount, approvalRating, expectedStart, id, latitude, longitude });
   }
 
   isLoading.value = false;
@@ -129,8 +133,4 @@ const confirmDelete = (event: any, developmentId: string) => {
     }
   });
 };
-
-onMounted(() => {
-  open();
-});
 </script>
