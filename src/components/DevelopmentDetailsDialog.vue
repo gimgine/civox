@@ -1,14 +1,20 @@
 <template>
-  <prime-dialog class="w-1/3 h-[90%]" :pt="{ content: 'h-full' }" v-model:visible="isDialogVisible" :header="development?.title" position="left">
+  <prime-dialog class="w-1/3 h-[90%]" :pt="{ content: 'h-full' }" v-model:visible="isDialogVisible" position="left">
+    <template #header>
+      <div class="flex gap-4">
+        <span class="text-xl font-bold" v-show="!isLoading">{{ development.title }}</span>
+        <tag :value="development.type?.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())" v-show="!isLoading" />
+      </div>
+    </template>
     <div v-show="isLoading" class="flex items-center justify-center h-full">
       <progress-spinner class="h-20" stroke-width="5" :pt="{ circle: '!stroke-[var(--primary-color)]' }" />
     </div>
 
     <div v-show="!isLoading">
-      <prime-carousel :value="imageUrls" :num-visible="2">
+      <prime-carousel :value="imageUrls" :num-visible="1">
         <template #item="slotProps">
           <div class="flex items-center justify-center">
-            <prime-image :src="slotProps.data" preview />
+            <prime-image :src="slotProps.data" preview width="250" />
           </div>
         </template>
       </prime-carousel>
@@ -77,6 +83,7 @@ import PrimeCarousel from 'primevue/carousel';
 import PrimeImage from 'primevue/image';
 import PrimeButton from 'primevue/button';
 import ProgressSpinner from 'primevue/progressspinner';
+import Tag from 'primevue/tag';
 import pb from '@/util/pocketbase';
 import { ref } from 'vue';
 import type { DevelopmentsResponse, FeedbackResponse, UsersResponse } from '@/util/pocketbase-types';
