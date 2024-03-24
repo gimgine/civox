@@ -23,7 +23,7 @@
                 }
               "
             />
-            <prime-button icon="pi pi-times" severity="danger" rounded class="w-8 h-8" @click="confirmDelete($event, slotProps.data.developmentId)" />
+            <prime-button icon="pi pi-times" severity="danger" rounded class="w-8 h-8" @click="confirmDelete($event, slotProps.data.id)" />
           </div>
         </template>
       </column>
