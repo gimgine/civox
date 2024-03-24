@@ -60,6 +60,7 @@
   </toggle-button>
   <add-development-dialog ref="addDevelopmentDialog" @close="handleAddClose" />
   <development-details-dialog ref="developmentDetailsDialog" />
+  <developer-dashboard @dialog-close="reload" />
 </template>
 
 <script setup lang="ts">
@@ -67,6 +68,7 @@ import AddDevelopmentDialog from '@/components/AddDevelopmentDialog.vue';
 import DevelopmentDetailsDialog from '@/components/DevelopmentDetailsDialog.vue';
 import ToggleButton from 'primevue/togglebutton';
 import PrimeButton from 'primevue/button';
+import DeveloperDashboard from '@/components/DeveloperDashboard.vue';
 import Message from 'primevue/message';
 import { onMounted, ref } from 'vue';
 import pb from '@/util/pocketbase';
@@ -171,7 +173,12 @@ const handleAddClose = async (submitted: boolean) => {
   if (submitted) developments.value = await pb.collection('developments').getFullList();
 };
 
-onMounted(async () => {
+const reload = async () => {
+  developments.value = [];
   developments.value = await pb.collection('developments').getFullList();
+};
+
+onMounted(async () => {
+  reload();
 });
 </script>
