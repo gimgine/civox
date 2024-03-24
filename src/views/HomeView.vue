@@ -6,16 +6,32 @@
     class="w-full h-full"
     @click="handleMapClick"
     @zoom_changed="handleZoomChange"
-    :options="{ disableDefaultUI: true }"
+    :options="{
+      disableDefaultUI: true,
+      styles: [
+        {
+          featureType: 'poi', // Points of Interest
+          elementType: 'labels', // Targeting labels of POI
+          stylers: [{ visibility: 'off' }] // Hide labels
+        }
+      ]
+    }"
   >
     <g-map-marker
       v-for="development in showMarkers ? developments : []"
       :position="{ lat: development.latitude, lng: development.longitude }"
-      :icon="{
-        url: '/favicon.ico',
-        labelOrigin: { x: 16, y: -10 }
+      :label="{
+        text: development.title,
+        className: `translate-y-8 font-bold`
       }"
-      :label="development.title"
+    />
+    <g-map-marker
+      v-for="development in showMarkers ? developments : []"
+      :position="{ lat: development.latitude, lng: development.longitude }"
+      :label="{
+        text: categoriesToIcons[developmentTypesToCategories[development.type]],
+        className: `![font-family:'Font_Awesome_5_Free'] font-black !text-white !text-xs`
+      }"
       @click="developmentDetailsDialog.open(development.id)"
     />
     <g-map-marker v-if="addPosition" :position="addPosition" />
@@ -47,6 +63,75 @@ import { onMounted, ref } from 'vue';
 import pb from '@/util/pocketbase';
 import type { DevelopmentsResponse } from '@/util/pocketbase-types';
 
+enum categories {
+  FOOD,
+  RESIDENTIAL,
+  COMMERCE,
+  TRANSPORTATION,
+  RECREATION,
+  HEALTH,
+  INDUSTRIAL,
+  EDUCATION,
+  ENVIRONMENTAL,
+  PUBLIC_SERVICES
+}
+
+const categoriesToIcons = {
+  [categories.FOOD]: '\uf2e7',
+  [categories.RESIDENTIAL]: '\uf015',
+  [categories.COMMERCE]: '\uf54e',
+  [categories.TRANSPORTATION]: '\uf1b9',
+  [categories.RECREATION]: '\uf70c',
+  [categories.HEALTH]: '\uf0fa',
+  [categories.INDUSTRIAL]: '\uf807',
+  [categories.EDUCATION]: '\uf501',
+  [categories.ENVIRONMENTAL]: '\uf4d8',
+  [categories.PUBLIC_SERVICES]: '\uf66f'
+};
+
+const developmentTypesToCategories = {
+  apartmentComplex: categories.RESIDENTIAL,
+  singleFamilyHome: categories.RESIDENTIAL,
+  condominium: categories.RESIDENTIAL,
+  seniorLivingFacility: categories.HEALTH,
+  restaurant: categories.FOOD,
+  hotel: categories.RESIDENTIAL,
+  bank: categories.COMMERCE,
+  retailStore: categories.COMMERCE,
+  shoppingMall: categories.COMMERCE,
+  officeBuilding: categories.COMMERCE,
+  factory: categories.INDUSTRIAL,
+  warehouse: categories.INDUSTRIAL,
+  researchLab: categories.INDUSTRIAL,
+  school: categories.EDUCATION,
+  hospital: categories.HEALTH,
+  policeStation: categories.PUBLIC_SERVICES,
+  fireStation: categories.PUBLIC_SERVICES,
+  library: categories.PUBLIC_SERVICES,
+  park: categories.RECREATION,
+  sportsComplex: categories.RECREATION,
+  recreationalCenter: categories.RECREATION,
+  playground: categories.RECREATION,
+  road: categories.TRANSPORTATION,
+  bridge: categories.TRANSPORTATION,
+  railway: categories.TRANSPORTATION,
+  subway: categories.TRANSPORTATION,
+  busStation: categories.TRANSPORTATION,
+  airport: categories.TRANSPORTATION,
+  port: categories.TRANSPORTATION,
+  museum: categories.RECREATION,
+  theater: categories.RECREATION,
+  concertHall: categories.RECREATION,
+  historicMonument: categories.PUBLIC_SERVICES,
+  communityGarden: categories.ENVIRONMENTAL,
+  greenRoof: categories.ENVIRONMENTAL,
+  conservationArea: categories.ENVIRONMENTAL,
+  wildlifeHabitat: categories.ENVIRONMENTAL,
+  solarFarm: categories.ENVIRONMENTAL,
+  windTurbine: categories.ENVIRONMENTAL,
+  waterTreatmentPlant: categories.ENVIRONMENTAL
+};
+
 const developmentDetailsDialog = ref({} as InstanceType<typeof DevelopmentDetailsDialog>);
 const googleMap = ref();
 const addDevelopmentDialog = ref();
@@ -59,7 +144,7 @@ const handleMapClick = (event: any) => {
   if (!isAddSelected.value) return;
   addPosition.value = { lat: event.latLng.lat(), lng: event.latLng.lng() };
   googleMap.value.panTo(addPosition.value);
-  addDevelopmentDialog.value.open();
+  addDevelopmentDialog.value.open(addPosition.value);
   isAddSelected.value = false;
 };
 
