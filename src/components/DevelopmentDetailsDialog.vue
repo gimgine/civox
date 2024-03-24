@@ -116,7 +116,6 @@ const reload = async (developmentId: string) => {
 
   const feedbackResponse = await pb.collection('feedback').getFullList({ filter: `development="${developmentId}"` });
   feedback.value = feedbackResponse;
-  console.log(pb.authStore.isValid);
   if (feedbackResponse.some((f) => f.user === pb.authStore.model?.id) || !pb.authStore.isValid) {
     canAddFeedback.value = false;
   }

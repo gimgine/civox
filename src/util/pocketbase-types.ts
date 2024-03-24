@@ -95,12 +95,15 @@ export enum FeedbackVoteOptions {
 export type FeedbackRecord = {
   content?: string;
   development: RecordIdString;
-  user?: RecordIdString;
+  user: RecordIdString;
   username?: string;
   vote?: FeedbackVoteOptions;
 };
 
-export type UsersRecord = never;
+export type UsersRecord = {
+  companyName?: string;
+  isDeveloper?: boolean;
+};
 
 // Response types include system fields and match responses from the PocketBase API
 export type DevelopmentsResponse<Texpand = unknown> = Required<DevelopmentsRecord> & BaseSystemFields<Texpand>;

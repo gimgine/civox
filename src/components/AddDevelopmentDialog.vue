@@ -64,6 +64,7 @@
       <div class="flex flex-col gap-1">
         <label for="proposedBy" :class="`${development.proposedBy.error ? 'p-error' : ''}`">Company</label>
         <input-text
+          disabled
           id="proposedBy"
           v-model="development.proposedBy.value"
           :class="`${development.proposedBy.error ? 'p-invalid focus:[box-shadow:0_0_0_0.2rem_var(--red-100)]' : ''}`"
@@ -164,7 +165,7 @@ const open = (location: object) => {
     description: { value: '', error: '' },
     type: { value: undefined, error: '' },
     images: { value: undefined, error: '' },
-    proposedBy: { value: '', error: '' },
+    proposedBy: { value: pb.authStore.model?.companyName, error: '' },
     expectedStart: { value: '', error: '' },
     location: { value: location }
   };

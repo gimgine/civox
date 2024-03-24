@@ -49,6 +49,7 @@
   />
   <prime-button v-if="pb.authStore.isValid" class="absolute top-6 right-10" label="Sign Out" @click="signOut" icon="pi pi-sign-in" />
   <toggle-button
+    v-if="pb.authStore.model?.isDeveloper"
     class="absolute bottom-10 right-10 w-16 h-16"
     on-label=""
     off-label=""
