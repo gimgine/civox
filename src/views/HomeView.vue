@@ -40,6 +40,14 @@
   <message class="absolute top-10 left-1/2 -translate-x-1/2" :closable="false" severity="secondary" v-show="isAddSelected">
     Left click anywhere to add a development
   </message>
+  <prime-button
+    v-if="!pb.authStore.isValid"
+    class="absolute top-6 right-10"
+    label="Sign In"
+    @click="$router.push({ name: 'login' })"
+    icon="pi pi-sign-in"
+  />
+  <prime-button v-if="pb.authStore.isValid" class="absolute top-6 right-10" label="Sign Out" @click="signOut" icon="pi pi-sign-in" />
   <toggle-button
     class="absolute bottom-10 right-10 w-16 h-16"
     on-label=""
@@ -139,6 +147,11 @@ const showMarkers = ref(true);
 const isAddSelected = ref(false);
 const addPosition = ref<object | null>(null);
 const developments = ref<DevelopmentsResponse[]>([]);
+
+const signOut = () => {
+  pb.authStore.clear();
+  window.location.reload();
+};
 
 const handleMapClick = (event: any) => {
   if (!isAddSelected.value) return;
