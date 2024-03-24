@@ -31,7 +31,7 @@ const content = ref<string>();
 const vote = ref<boolean | undefined>(undefined);
 const errorText = ref<string>();
 
-const props = defineProps<{ developmentId: string }>();
+const props = defineProps<{ developmentId: string | undefined }>();
 const emits = defineEmits<{ (e: 'form-submit'): void }>();
 
 const toggle = () => {
@@ -60,6 +60,8 @@ const submitForm = async () => {
   }
 
   await pb.collection('feedback').create({
+    user: pb.authStore.model?.id,
+    username: pb.authStore.model?.username,
     content: content.value,
     development: props.developmentId,
     vote: vote.value === true ? FeedbackVoteOptions.yay : FeedbackVoteOptions.nay
