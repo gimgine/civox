@@ -71,6 +71,7 @@
     Left click anywhere to add a development
   </message>
   <toggle-button
+    v-if="pb.authStore.model?.isDeveloper"
     class="absolute bottom-10 right-10 w-16 h-16"
     on-label=""
     off-label=""
@@ -81,6 +82,7 @@
   </toggle-button>
   <add-development-dialog ref="addDevelopmentDialog" @close="handleAddClose" />
   <development-details-dialog ref="developmentDetailsDialog" />
+  <developer-dashboard @dialog-close="reload" />
 </template>
 
 <script setup lang="ts">
@@ -88,6 +90,7 @@ import AddDevelopmentDialog from '@/components/AddDevelopmentDialog.vue';
 import DevelopmentDetailsDialog from '@/components/DevelopmentDetailsDialog.vue';
 import ToggleButton from 'primevue/togglebutton';
 import PrimeButton from 'primevue/button';
+import DeveloperDashboard from '@/components/DeveloperDashboard.vue';
 import Message from 'primevue/message';
 import Sidebar from 'primevue/sidebar';
 import InputGroup from 'primevue/inputgroup';
@@ -225,7 +228,26 @@ watch(activeCategories, async (value) => {
   });
 });
 
-onMounted(async () => {
+watch(activeCategories, async (value) => {
+  if (!value.length) {
+    developments.value = [];
+    return;
+  }
+  developments.value = await pb.collection('developments').getFullList({
+    filter: Object.keys(DevelopmentsTypeOptions)
+      .filter((val) => value.includes(developmentTypesToCategories[val]))
+      .map((val) => `type='${val}'`)
+      .join('||'),
+    requestKey: null
+  });
+});
+
+const reload = async () => {
+  developments.value = [];
   developments.value = await pb.collection('developments').getFullList();
+};
+
+onMounted(async () => {
+  reload();
 });
 </script>

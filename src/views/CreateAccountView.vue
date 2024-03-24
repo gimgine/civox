@@ -10,8 +10,19 @@
       </template>
       <template #content>
         <div class="flex flex-col gap-3 px-8">
+          <div class="flex gap-2">
+            <input-switch v-model="isDeveloper" />
+            <label>Developer account?</label>
+          </div>
+
+          <div v-if="isDeveloper" class="flex flex-col gap-2">
+            <label for="createCompanyname">{{ 'Company Name' }}</label>
+            <input-text id="createCompanyName" v-model="companyNameText" :invalid="companyNameInvalid" />
+            <p class="text-red-500 text-sm italic">{{ companyNameErrorText }}</p>
+          </div>
+
           <div class="flex flex-col gap-2">
-            <label for="createUsername">Username</label>
+            <label for="createUsername">{{ isDeveloper ? 'Account Username' : 'Username' }}</label>
             <input-text id="createUsername" v-model="usernameText" :invalid="usernameInvalid" />
             <p class="text-red-500 text-sm italic">{{ usernameErrorText }}</p>
           </div>
@@ -53,23 +64,29 @@ import pb from '@/util/pocketbase';
 import PrimeButton from 'primevue/button';
 import PrimeCard from 'primevue/card';
 import InputText from 'primevue/inputtext';
+import InputSwitch from 'primevue/inputswitch';
 import PrimePassword from 'primevue/password';
 import { useToast } from 'primevue/usetoast';
 import { ref } from 'vue';
+import type { UsersRecord } from '@/util/pocketbase-types';
 
 const toast = useToast();
 
 const usernameInvalid = ref(false);
 const passwordInvalid = ref(false);
 const confirmPasswordInvalid = ref(false);
+const companyNameInvalid = ref(false);
+const isDeveloper = ref(false);
 
 const usernameErrorText = ref('');
 const passwordErrorText = ref('');
 const confirmPasswordErrorText = ref('');
+const companyNameErrorText = ref('');
 
 const usernameText = ref('');
 const passwordText = ref('');
 const confirmPasswordText = ref('');
+const companyNameText = ref('');
 const errorText = ref('');
 const createLoading = ref(false);
 
@@ -81,10 +98,18 @@ const create = async () => {
   passwordErrorText.value = '';
   usernameErrorText.value = '';
   confirmPasswordErrorText.value = '';
+  companyNameErrorText.value = '';
 
   usernameInvalid.value = false;
   passwordInvalid.value = false;
   confirmPasswordInvalid.value = false;
+  companyNameInvalid.value = false;
+
+  if (isDeveloper.value && companyNameText.value.length === 0) {
+    companyNameErrorText.value = 'Company name is required.';
+    companyNameInvalid.value = true;
+    return;
+  }
 
   if (usernameText.value.length === 0) {
     usernameErrorText.value = 'Username is required.';
@@ -116,9 +141,23 @@ const create = async () => {
     return;
   }
 
+  const submission = isDeveloper
+    ? {
+        username: usernameText.value,
+        password: passwordText.value,
+        passwordConfirm: confirmPasswordText.value,
+        isDeveloper: isDeveloper.value,
+        companyName: companyNameText.value
+      }
+    : {
+        username: usernameText.value,
+        password: passwordText.value,
+        passwordConfirm: confirmPasswordText.value
+      };
+
   createLoading.value = true;
   pb.collection('users')
-    .create({ username: usernameText.value, password: passwordText.value, passwordConfirm: confirmPasswordText.value })
+    .create(submission)
     .then(() => {
       toast.add({ severity: 'success', summary: 'Success', detail: 'Your account was created successfully.', life: 3000 });
       router.push({ name: 'login' });

@@ -2,6 +2,7 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
+import ConfirmationService from 'primevue/confirmationservice';
 import Tooltip from 'primevue/tooltip';
 import VueGoogleMaps from '@fawmi/vue-google-maps';
 import App from './App.vue';
@@ -17,6 +18,7 @@ app.use(router);
 app.use(pinia);
 app.use(PrimeVue);
 app.use(ToastService);
+app.use(ConfirmationService);
 app.use(VueGoogleMaps, {
   load: {
     key: 'AIzaSyC-mFZCyXPzuN8X_wJHOQ8qR-EitpDH1r4'
